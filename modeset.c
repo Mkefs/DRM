@@ -21,7 +21,7 @@ static int modeset_setup_dev(int fd, drmModeRes *res,
 	drmModeConnector *conn, struct modeset_dev *dev);
 static int modeset_open(int *out, const char *node);
 static int modeset_prepare(int fd);
-static void modeset_draw(void);
+static void modeset_draw();
 static void modeset_cleanup(int fd);
 
 // Open the linux device driver of a graphic card
@@ -332,7 +332,7 @@ int main(int argc, char **argv){
 	// Open drm device
 	ret = modeset_open(&fd, card);
 	if(ret)
-		goto out_close;
+		goto out_return;
 
 	// Prepare all conectors and crtcs
 	ret = modeset_prepare(fd);
@@ -399,21 +399,20 @@ static void modeset_draw(void) {
     r_up = g_up = b_up = true;
 
     for (i = 0; i < 50; ++i) {
-	r = next_color(&r_up, r, 20);
-	g = next_color(&g_up, g, 10);
-	b = next_color(&b_up, b, 5);
+		r = next_color(&r_up, r, 20);
+		g = next_color(&g_up, g, 10);
+		b = next_color(&b_up, b, 5);
 
-	for (iter = modeset_list; iter; iter = iter->next) {
-	    for (j = 0; j < iter->height; ++j) {
-		for (k = 0; k < iter->width; ++k) {
-		    off = iter->stride * j + k * 4;
-		    *(uint32_t*)&iter->map[off] =
-			(r << 16) | (g << 8) | b;
+		for (iter = modeset_list; iter; iter = iter->next) {
+			for (j = 0; j < iter->height; ++j) {
+				for (k = 0; k < iter->width; ++k) {
+					off = iter->stride * j + k * 4;
+					*(uint32_t*)&iter->map[off] = 
+						(r << 16) | (g << 8) | b;
+				}
+			}
 		}
-	    }
-	}
-
-	usleep(100000);
+		usleep(100000);
     }
 }
 

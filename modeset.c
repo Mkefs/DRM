@@ -92,7 +92,7 @@ static int modeset_prepare(int fd){
 	}
 	
 	// Iterate all connectors
-	for(i = 0; i < res->count_connectors; i++){
+	for(i = 0; i < (unsigned int)res->count_connectors; ++i){
 		// Get all connector info
 		conn = drmModeGetConnector(fd, res->connectors[i]);
 		if(!conn){
@@ -192,7 +192,7 @@ static int modeset_find_crtc(int fd, drmModeRes *res,
 		if(enc->crtc_id){
 			crtc = enc->crtc_id;
 			for(iter = modeset_list; iter; iter = iter->next){
-				if(iter->crtc == crtc){
+				if((int32_t)iter->crtc == crtc){
 					crtc = -1;
 					break;
 				}
@@ -212,7 +212,7 @@ static int modeset_find_crtc(int fd, drmModeRes *res,
 	// or if the encoder+crtc is already used by another connector
 	// (actualy unlikely but lets be safe), iterate all other available
 	// encoders to find a matching CRTC	
-	for(i = 0; i < conn->count_encoders; i++){
+	for(i = 0; i < (unsigned int)conn->count_encoders; ++i){
 		enc = drmModeGetEncoder(fd, conn->encoders[i]);
 		if(!enc){
 			fprintf(stderr, "cannot retrive encoder %u:%u (%d): %m\n",
@@ -221,7 +221,7 @@ static int modeset_find_crtc(int fd, drmModeRes *res,
 		}
 
 		// Iterate all global CRTCs
-		for(j = 0; j < res->count_crtcs; j++){
+		for(j = 0; j < (unsigned int)res->count_crtcs; j++){
 			// Check if this CRTC work with the encoder
 			if(!(enc->possible_crtcs & (1 << j)))
 				continue;
@@ -229,7 +229,7 @@ static int modeset_find_crtc(int fd, drmModeRes *res,
 			// Check that no other device already uses this CRTC
 			crtc = res->crtcs[j];
 			for(iter = modeset_list; iter; iter = iter->next){
-				if(iter->crtc == crtc){
+				if((int32_t)iter->crtc == crtc){
 					crtc = -1;
 					break;
 				}
@@ -373,15 +373,15 @@ out_return:
 
 
 static uint8_t next_color(bool *up, uint8_t cur, unsigned int mod) {
-    uint8_t next;
+	uint8_t next;
 
-    next = cur + (*up ? 1 : -1) * (rand() % mod);
-    if ((*up && next < cur) || (!*up && next > cur)) {
-	*up = !*up;
-	next = cur;
-    }
+	next = cur + (*up ? 1 : -1) * (rand() % mod);
+	if ((*up && next < cur) || (!*up && next > cur)) {
+		*up = !*up;
+		next = cur;
+	}
 
-    return next;
+	return next;
 }
 
 

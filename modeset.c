@@ -221,7 +221,7 @@ static int modeset_find_crtc(int fd, drmModeRes *res,
 		}
 
 		// Iterate all global CRTCs
-		for(j = 0; j < (unsigned int)res->count_crtcs; j++){
+		for(j = 0; j < (unsigned int)res->count_crtcs; ++j){
 			// Check if this CRTC work with the encoder
 			if(!(enc->possible_crtcs & (1 << j)))
 				continue;
